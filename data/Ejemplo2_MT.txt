@@ -1,0 +1,21 @@
+# Ejemplo de una MT
+# Considerando que un numero n se representa como 1^n
+# La MT calcula el doble de un numero
+q0 q1 q2 q3 q4 q5
+1
+. 1 a
+q0
+.
+q5
+q0 1 q1 a L
+q1 1 q1 1 L
+q1 a q1 a L
+q1 . q2 1 R
+q2 1 q2 1 R
+q2 a q3 a R
+q3 a q3 a R
+q3 1 q1 a L
+q3 . q4 . L
+q4 a q4 1 L
+q4 1 q4 1 L
+q4 . q5 . R

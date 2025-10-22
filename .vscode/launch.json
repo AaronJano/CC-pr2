@@ -1,0 +1,36 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    // {
+    //   "name": "Debug TM",
+    //   "type": "cppdbg",
+    //   "request": "launch",
+    //   "program": "${workspaceFolder}/build/TM",
+    //   "args": [
+    //     "${workspaceFolder}/data/Ejemplo_MT.txt"
+    //   ],
+    //   "stopAtEntry": false,
+    //   "cwd": "${workspaceFolder}",
+    //   "environment": [],
+    //   "externalConsole": true,
+    //   "MIMode": "gdb",
+    //   "preLaunchTask": "build TM"
+    // },
+    {
+      "name": "Debug TM (integrated)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/TM",
+      "args": [
+        "${workspaceFolder}/data/Ejemplo_MT.txt"
+      ],
+      "stopAtEntry": true,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      // Let the extension auto-detect the debugger instead of hardcoding the path
+      "MIMode": "gdb",
+      "preLaunchTask": "build TM"
+    }
+  ]
+}
