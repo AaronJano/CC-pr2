@@ -23,9 +23,12 @@ int main(int argc, char** argv) {
     std::string input = "";
     std::cout << "Enter input string for the Turing Machine: ";
     std::cin >> input;
-
-    tm.loadTape(input);
-
+    try {
+      tm.loadTape(input);
+    } catch (const std::invalid_argument& e) {
+      std::cerr << "Invalid input: " << e.what() << std::endl;
+      continue;
+    }
     bool accepted = tm.run(10000);
     std::cout << "Final state: " << tm.currentState() << std::endl;
     std::cout << "Accepted: " << (accepted ? "yes" : "no") << std::endl;

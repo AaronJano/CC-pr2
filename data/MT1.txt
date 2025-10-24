@@ -1,0 +1,13 @@
+#MT que reconozca el lenguaje L = { a^n b^m | m > n, n > 0 }
+q0 q1 q2
+a b
+a b . 
+q0
+.
+q2
+2
+q0 a . q0 a R a R
+q0 b . q1 b R . L
+q1 b a q1 b R a L
+q1 b . q2 b S . S
+q1 . . q2 . S . S

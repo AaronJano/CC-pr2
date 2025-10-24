@@ -147,6 +147,8 @@ bool Parser::parseFile(const std::string& path, TuringMachine& tm,
   // assign parsed elements to TuringMachine
   tm = TuringMachine(numberOfTapes);
   tm.setStates(states);
+  // set input alphabet parsed from file (if any)
+  tm.setInputAlphabet(inputAlpha);
   if (!start.empty()) tm.setStartState(start);
   if (!blank.empty()) tm.setBlank(blank[0]);
   tm.setAcceptStates(accepts);
@@ -156,14 +158,39 @@ bool Parser::parseFile(const std::string& path, TuringMachine& tm,
     auto toks = split_ws(l);
     if (toks.size() < 5) continue;
     std::string from = toks[0];
-    std::string readS = toks[1];
-    std::string to = toks[2];
-    std::string writeS = toks[3];
-    std::string moveS = toks[4];
 
-    auto reads = split_comma(readS);
-    auto writes = split_comma(writeS);
-    auto moves = split_comma(moveS);
+    std::vector<std::string> reads;
+    std::string to;
+    std::vector<std::string> writes;
+    std::vector<std::string> moves;
+
+    // Two accepted formats:
+    // 1) compact comma-separated fields: from read1,read2 to write1,write2
+    // move1,move2
+    //    -> tokens: [from, readField, to, writeField, moveField]
+    // 2) expanded space-separated per-tape: from r1 r2 ... to w1 m1 w2 m2 ...
+    //    -> tokens: size == 2 + 3*numberOfTapes
+    if (toks.size() == 2 + 3 * numberOfTapes) {
+      // expanded format
+      for (size_t i = 0; i < numberOfTapes; ++i) reads.push_back(toks[1 + i]);
+      to = toks[1 + numberOfTapes];
+      size_t idx = 2 + numberOfTapes;
+      for (size_t i = 0; i < numberOfTapes; ++i) {
+        if (idx + 1 >= toks.size()) break;
+        writes.push_back(toks[idx]);
+        moves.push_back(toks[idx + 1]);
+        idx += 2;
+      }
+    } else {
+      // compact comma-separated format (backwards compatible)
+      std::string readS = toks[1];
+      to = toks[2];
+      std::string writeS = toks[3];
+      std::string moveS = toks[4];
+      reads = split_comma(readS);
+      writes = split_comma(writeS);
+      moves = split_comma(moveS);
+    }
 
     bool found = false;
     for (std::string& state : states) {
@@ -179,6 +206,10 @@ bool Parser::parseFile(const std::string& path, TuringMachine& tm,
       return false;
     }
 
+    if (reads.size() != numberOfTapes) {
+      error = "transition has wrong number of read symbols: " + l;
+      return false;
+    }
     for (std::string& r : reads) {
       if (r.size() != 1) {
         error = "invalid read symbol in transition line: " + l;
@@ -212,6 +243,10 @@ bool Parser::parseFile(const std::string& path, TuringMachine& tm,
       return false;
     }
 
+    if (writes.size() != numberOfTapes) {
+      error = "transition has wrong number of write symbols: " + l;
+      return false;
+    }
     for (std::string& w : writes) {
       if (w.size() != 1) {
         error = "invalid write symbol in transition line: " + l;
@@ -232,6 +267,10 @@ bool Parser::parseFile(const std::string& path, TuringMachine& tm,
       }
     }
 
+    if (moves.size() != numberOfTapes) {
+      error = "transition has wrong number of move symbols: " + l;
+      return false;
+    }
     for (std::string& m : moves) {
       if (m.size() != 1 || (m[0] != 'L' && m[0] != 'R' && m[0] != 'S')) {
         error = "invalid move symbol in transition line: " + l;
@@ -246,12 +285,14 @@ bool Parser::parseFile(const std::string& path, TuringMachine& tm,
     new_transition.write.assign(numberOfTapes, '.');
     new_transition.move.assign(numberOfTapes, 'R');
 
-    for (size_t i = 0; i < reads.size(); ++i)
-      if (!reads[i].empty()) new_transition.read[i] = reads[i][0];
-    for (size_t i = 0; i < writes.size(); ++i)
-      if (!writes[i].empty()) new_transition.write[i] = writes[i][0];
-    for (size_t i = 0; i < moves.size(); ++i)
-      if (!moves[i].empty()) new_transition.move[i] = moves[i][0];
+    for (size_t i = 0; i < numberOfTapes; ++i) {
+      if (i < reads.size() && !reads[i].empty())
+        new_transition.read[i] = reads[i][0];
+      if (i < writes.size() && !writes[i].empty())
+        new_transition.write[i] = writes[i][0];
+      if (i < moves.size() && !moves[i].empty())
+        new_transition.move[i] = moves[i][0];
+    }
 
     tm.addTransition(new_transition);
   }

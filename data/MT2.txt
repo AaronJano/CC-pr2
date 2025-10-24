@@ -1,0 +1,27 @@
+# MT que reciba como parámetro una cadena compuesta por símbolos ‘a’ y ‘b’. La
+# MT debe sustituir la cadena por el número de símbolos ‘a’, seguido del número de
+# símbolos ‘b’ separados por un símbolo blanco. El número se codificará como n = 1^(n+1)
+#
+# La cabeza de L/E debe quedar al principio del resultado:
+# Ejemplo: Cinta inicial (con la cadena de entrada): •abbabaabb•
+#   Cinta final (con el resultado): •11111•111111•
+# Si la cadena está compuesta por símbolos del mismo tipo, se reflejará con un “1” la
+# ausencia del otro símbolo:
+# Ejemplos: Cinta al inicio (con la cadena de entrada): •aa•
+#   Cinta al final (con el resultado): •111•1•
+# Cinta al inicio (con la cadena de entrada): •bb•
+#   Cinta al final (con el resultado): •1•111•
+q0 q1 q2 q3
+a b
+a b 1 .
+q0
+.
+q3
+3
+q0 a . . q0 . R 1 R . S
+q0 b . . q0 . R . S 1 R
+q0 . . . q1 1 R . L . S
+q1 . 1 . q1 1 R . L . S
+q1 . . . q2 . R . S . L
+q2 . . 1 q2 1 R . S . L
+q2 . . . q3 1 S . S . S

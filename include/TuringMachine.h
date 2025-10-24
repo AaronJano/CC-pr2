@@ -36,6 +36,7 @@ class TuringMachine {
   std::unordered_set<std::string> acceptStates;
   std::vector<Transition> transitions;
   std::vector<Tape> tapes;
+  std::unordered_set<char> inputAlphabet;
   std::string startState;
   std::string state;
   char blank;

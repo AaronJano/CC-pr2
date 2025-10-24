@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <stdexcept>
 
 TuringMachine::TuringMachine(size_t nTapes) : tapes(), blank('.') {
   if (nTapes == 0) nTapes = 1;
@@ -13,7 +14,10 @@ void TuringMachine::setStates(const std::vector<std::string>& sts) {
   for (auto& s : sts) states.insert(s);
 }
 
-void TuringMachine::setInputAlphabet(const std::vector<char>&) {}
+void TuringMachine::setInputAlphabet(const std::vector<char>& alpha) {
+  inputAlphabet.clear();
+  for (char c : alpha) inputAlphabet.insert(c);
+}
 void TuringMachine::setTapeAlphabet(const std::vector<char>&) {}
 
 void TuringMachine::setStartState(const std::string& s) {
@@ -44,12 +48,22 @@ void TuringMachine::addTransition(const Transition& t) {
 }
 
 void TuringMachine::loadTape(const std::string& input) {
+  // validate input against inputAlphabet (if one was set)
+  if (!inputAlphabet.empty()) {
+    for (char c : input) {
+      if (inputAlphabet.find(c) == inputAlphabet.end()) {
+        throw std::invalid_argument(
+            std::string("input contains symbol not in input alphabet: ") + c);
+      }
+    }
+  }
+
   // load input into tape 0; other tapes blank
   for (size_t i = 0; i < nTapes(); ++i) tapes[i] = Tape(blank);
   // write input starting at head position on tape 0
   for (size_t i = 0; i < input.size(); ++i) {
     tapes[0].write(input[i]);
-    if (i + 1 < input.size()) tapes[0].moveRight();  // check
+    if (i + 1 < input.size()) tapes[0].moveRight();
   }
 
   tapes[0].setHeadIndex(0);  // reset head to start of input
