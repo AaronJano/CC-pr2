@@ -21,8 +21,11 @@ int main(int argc, char** argv) {
 
   do {
     std::string input = "";
-    std::cout << "Enter input string for the Turing Machine: ";
+    std::cout << "Enter input string for the Turing Machine (.q to exit): ";
     std::cin >> input;
+    if (input == ".q") {
+      break;
+    }
     try {
       tm.loadTape(input);
     } catch (const std::invalid_argument& e) {
