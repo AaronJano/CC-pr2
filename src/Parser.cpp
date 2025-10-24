@@ -60,21 +60,23 @@ bool Parser::parseFile(const std::string& path, TuringMachine& tm,
     if (step == 0) {
       states = tokens;
     } else if (step == 1) {
-      for (auto& t : tokens)
+      for (auto& t : tokens) {
         if (t.size() == 1) {
           inputAlpha.push_back(t[0]);
         } else {
           error = "invalid symbol in input alphabet: " + t;
           return false;
         }
+      }
     } else if (step == 2) {
-      for (auto& t : tokens)
+      for (auto& t : tokens) {
         if (t.size() == 1) {
           tapeAlpha.push_back(t[0]);
         } else {
           error = "invalid symbol in tape alphabet: " + t;
           return false;
         }
+      }
     } else if (step == 3) {
       if (!tokens.empty()) {
         start = tokens[0];
@@ -104,6 +106,17 @@ bool Parser::parseFile(const std::string& path, TuringMachine& tm,
       }
       if (found) {
         error = "blank symbol cannot be in input alphabet: " + blank;
+        return false;
+      }
+      bool contains_blank = false;
+      for (char& c : tapeAlpha) {
+        if (!blank.empty() && c == blank[0]) {
+          contains_blank = true;
+          break;
+        }
+      }
+      if (!contains_blank) {
+        error = "tape alphabet must include blank symbol: " + blank;
         return false;
       }
     } else if (step == 5) {

@@ -1,6 +1,6 @@
 #MT que reconozca el lenguaje L = { a^n b^m | m > n, n > 0 }
 q3 q0 q1 q2
-a b
+a b .
 a b . 
 q3
 .
